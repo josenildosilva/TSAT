@@ -1,6 +1,13 @@
 package com.dwicke.tsat.dataprocess;
 
 
+import com.dwicke.tsat.view.TDAArgsPane;
+import com.sun.xml.internal.ws.api.ResourceLoader;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+
 /**
  * This class acts as an interface between the TDA python tool and TSAT.
  * It will act to store the file names of the multiattribute and the single attribute ts
@@ -27,6 +34,38 @@ public class TDAProcessing {
         this.lineLimit = limitStr;
         this.multiVarJsonFilename = dataFileName;
         this.isTestData = isTestdata;
+    }
+
+
+    public static void main(String args[]) {
+        TDAProcessing tdap = new TDAProcessing("32", "/home/drew/Desktop/TSATtutorial/mtsECG/ECG_TRAIN3.json", false);
+        tdap.univarTSFilename = "/home/drew/Desktop/TSATtutorial/mtsECG/ECG_TRAIN_UNIVAR";
+        tdap.lineLimit = "1";
+        tdap.multiToUniTDAProc();
+    }
+
+    public void multiToUniTDAProc() {
+
+        String fileName = "tdatool.sh";//"tdaInterface.py";
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File file = new File(classLoader.getResource(fileName).getFile());
+        System.err.println(file.getAbsolutePath());
+//source /opt/anaconda3/etc/profile.d/conda.sh; conda activate base;
+        //ProcessBuilder pb = new ProcessBuilder("bash", "-c", "source /home/drew/anaconda2/etc/profile.d/conda.sh;conda activate base; echo $CONDA_DEFAULT_ENV; conda execute -q /home/drew/src/TSAT/target/classes/testingPython.py ; echo hi");
+        ProcessBuilder pb = new ProcessBuilder("bash",file.getAbsolutePath(),multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(shouldConsolidate));
+        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectErrorStream(true);
+        Process p = null;
+        try {
+            p = pb.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            p.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 
