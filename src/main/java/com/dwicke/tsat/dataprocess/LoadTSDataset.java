@@ -96,6 +96,8 @@ public class LoadTSDataset {
         }
         else if (formatStyle == ARFF) {
             return new Object[] {formatStyle, loadARFF(fileName, isTestDataset)};
+        } else if (formatStyle == JSON) {
+            return new Object[] {formatStyle, fileName, isTestDataset};
         }
 
         return null;

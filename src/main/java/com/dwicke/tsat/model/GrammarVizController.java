@@ -1,5 +1,7 @@
 package com.dwicke.tsat.model;
 
+import com.dwicke.tsat.dataprocess.TDAProcessing;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -211,6 +213,28 @@ public class GrammarVizController extends Observable implements ActionListener {
 
     return rpmSaveListener;
   }
+
+
+  public ActionListener getTDAController(TDAProcessing tdaProcessing) {
+    ActionListener tdaController = new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Univariate Time Series Save Location");
+
+        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+          File file = fileChooser.getSelectedFile();
+          tdaProcessing.setUnivariateTSLocation(file.getAbsolutePath());
+
+        }
+
+      }
+    };
+
+    return tdaController;
+  }
+
+
 
   @Override
   public void actionPerformed(ActionEvent e) {

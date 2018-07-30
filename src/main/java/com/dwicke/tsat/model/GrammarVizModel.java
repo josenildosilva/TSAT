@@ -1,6 +1,7 @@
 package com.dwicke.tsat.model;
 
 import com.dwicke.tsat.dataprocess.LoadTSDataset;
+import com.dwicke.tsat.dataprocess.TDAProcessing;
 import com.dwicke.tsat.logic.GrammarVizChartData;
 import com.dwicke.tsat.logic.RPMHandler;
 import com.dwicke.tsat.dataprocess.UCRUtils;
@@ -102,11 +103,24 @@ public class GrammarVizModel extends Observable implements Observer {
 
     Object[] objData = LoadTSDataset.loadData(limitStr, this.dataFileName, false);
 
+
+    if ((int)objData[0] == LoadTSDataset.JSON) {
+
+      TDAProcessing tdaProc = new TDAProcessing(limitStr, this.dataFileName, false);
+      // this is a multivariate ts so need to notify observers
+      setChanged();
+      notifyObservers(new GrammarVizMessage(GrammarVizMessage.TDA_JSON_SELECTED, tdaProc));
+      return;
+
+
+    }
+
     if (((Object[]) objData[1]) == null) {
       // there was a problem with the file.
       this.setChanged();
       notifyObservers(new GrammarVizMessage(GrammarVizMessage.STATUS_MESSAGE, "Error in the formatting of file " + this.dataFileName));
     }
+
 
     if ((int)objData[0] != LoadTSDataset.singleTS) {
       this.enableRPM = true; // the single time ts is the only one that isn't classification

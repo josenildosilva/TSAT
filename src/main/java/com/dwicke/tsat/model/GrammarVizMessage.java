@@ -32,6 +32,10 @@ public class GrammarVizMessage {
   /** The RPM Classification Results update message Key */
   public static final String RPM_CLASS_RESULTS_UPDATE_MESSAGE = "rpm_class_results_update_message";
 
+  /** The tda json file selected key */
+  public static final String TDA_JSON_SELECTED = "tda_json_selected";
+
+
   /** The RPM Model Loading Error update message key */
   //public static final String RPM_MODEL_LOAD_ERROR_UPDATE_MESSAGE = "rpm_model_load_error_update_message";
 

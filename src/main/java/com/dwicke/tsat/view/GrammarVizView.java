@@ -1,5 +1,6 @@
 package com.dwicke.tsat.view;
 
+import com.dwicke.tsat.dataprocess.TDAProcessing;
 import com.dwicke.tsat.logic.GrammarVizChartData;
 import com.dwicke.tsat.logic.RPMHandler;
 import com.dwicke.tsat.model.GrammarVizController;
@@ -939,6 +940,24 @@ public class GrammarVizView implements Observer, ActionListener {
       // Show Dialog box if training data could not be loaded when loading model
       else if (GrammarVizMessage.RPM_MISSING_TRAIN_DATA_UPDATE_MESSAGE.equalsIgnoreCase(message.getType())) {
         this.controller.getRPMLoadMissingTrainListener().actionPerformed(new ActionEvent(this, 0, null));
+      }
+      else if (GrammarVizMessage.TDA_JSON_SELECTED.equalsIgnoreCase(message.getType())) {
+
+        TDAProcessing tdaProc = (TDAProcessing) message.getPayload();
+
+        TDAArgsPane parametersPanel = new TDAArgsPane(
+                tdaProc);
+
+        TDAArgsDialog parametersDialog = new TDAArgsDialog(frame, parametersPanel,
+                tdaProc);
+
+        parametersDialog.setVisible(true);
+
+        // then get the file to store the univariate data in
+        this.controller.getTDAController(tdaProc).actionPerformed(new ActionEvent(this, 0, null));
+
+        // now load
+
       }
     }
   }
