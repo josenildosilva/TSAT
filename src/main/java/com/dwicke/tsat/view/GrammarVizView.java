@@ -956,7 +956,7 @@ public class GrammarVizView implements Observer, ActionListener {
         // then get the file to store the univariate data in
         this.controller.getTDAController(tdaProc).actionPerformed(new ActionEvent(this, 0, null));
 
-        // now load
+
 
       }
     }

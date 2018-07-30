@@ -68,6 +68,13 @@ public class TDAProcessing {
         }
     }
 
+    public String getLineLimit() {
+        return lineLimit;
+    }
+
+    public void setLineLimit(String lineLimit) {
+        this.lineLimit = lineLimit;
+    }
 
     public void setUnivariateTSLocation(String filename) {
         this.univarTSFilename = filename;
