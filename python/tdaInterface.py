@@ -6,19 +6,9 @@
 
 from tda_tools import *
 import os
-from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.utils import resample
-from sklearn.model_selection import train_test_split
-import datetime
 import json
-import glob
-from random import shuffle
 import argparse
-get_ipython().run_line_magic('matplotlib', 'inline')
-
-
-# In[2]:
 
 
 def consolidate(y):
@@ -32,9 +22,6 @@ def consolidate(y):
         else:
             start = indexNonZero[i]
     return y
-
-
-# In[3]:
 
 
 def cubicInterpolate(y):
@@ -64,16 +51,16 @@ def cubicInterpolate(y):
     return interpVals # return the numpy array
 
 
-# In[4]:
-
 
 def multiToUniVar(mvTS, window, dt, pdim, maxrad):
     minLength = min([len(x) for x in mvTS])
+    shortenedAndLogDiff = []
     for ts in mvTS:
         newTS = ts[:minLength]
-        shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
-#                 plt.figure(figsize=(12,6),dpi=90)
-#                 plt.plot(np.log(np.divide(newTS[1:], newTS[0:-1])),label="bytes")
+        # shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
+        shortenedAndLogDiff.append(newTS)
+
+
     stacked = np.stack(shortenedAndLogDiff, axis=-1)
     norms2 = streamingLandscapePnorms(stacked,window, dt, pdim, dim=1,maxrad=maxrad)
     scaler = MinMaxScaler(feature_range=(0,1))
@@ -82,9 +69,6 @@ def multiToUniVar(mvTS, window, dt, pdim, maxrad):
 #         plt.figure(figsize=(12,6),dpi=90)
 #         plt.plot(norms2normed,label="bytes")
     return norms2normed
-
-
-# In[5]:
 
 
 def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad):
@@ -113,7 +97,6 @@ def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad
                     mvTS.append(var)
         
         # this was the min length other than all zeros which can be a thing...
-        shortenedAndLogDiff = []
         if len(mvTS) == 1:
             norms2normed = np.array(mvTS[0])
         elif len(mvTS) > 1:
@@ -139,7 +122,7 @@ parser.add_argument('window', help='The width of the window to compute persisten
 parser.add_argument('dt', help='number of samples to skip between points.',type=int)
 parser.add_argument('p', help='integer (type of L^p norm to compute)', default=2, type=int)
 parser.add_argument('maxrad', help='max distance between pairwise points to consider for the Rips complex', default=1.0, type=float)
-parser.add_argument('--shouldConsolidate', help='If true will merge values in the time series that are less than 10 time steps appart', type=bool, action="store_true")
+parser.add_argument('--shouldConsolidate', help='If true will merge values in the time series that are less than 10 time steps appart', action="store_true")
 
 args = parser.parse_args()
 
@@ -152,10 +135,12 @@ dt = args.dt
 pdim = args.p
 maxrad = args.maxrad
 
+print(consolidate)
+
 # then do this with the requested files.
-    with open(univarFile, 'w') as data_out:
-        data_out.write("#\n")
-        with open(multivarFile) as json_data:
-            d = json.load(json_data)
-            parseJson(d, data_out,numLines, window, dt, pdim, maxrad)
+with open(univarFile, 'w') as data_out:
+    data_out.write("#\n")
+    with open(multivarFile) as json_data:
+        d = json.load(json_data)
+        parseJson(d, data_out,numLines, consolidate, window, dt, pdim, maxrad)
 
