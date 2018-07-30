@@ -85,6 +85,7 @@ public class RPMHandler extends Observable implements Runnable {
      * @throws java.io.IOException
      */
     public synchronized void RPMTestData(String filename, double[][] data, String[] labels) throws java.io.IOException {
+
         this.testingLabels = getReformattedLabels(labels);
         this.testingResults = this.RPM.RPMTestData(filename, data, this.testingLabels);
     }
@@ -424,7 +425,14 @@ public class RPMHandler extends Observable implements Runnable {
             if (curLabels[i].equals("?")) {
                 newLabels[i] = "-1";
             } else {
-                newLabels[i] = classLabs.get(curLabels[i]).toString();
+                if (classLabs.containsKey(curLabels[i])) {
+                    newLabels[i] = classLabs.get(curLabels[i]).toString();
+                } else {
+                    log("The label " + curLabels[i] + " does not exist in the training data. The keys are:");
+                    for (String key : classLabs.keySet()) {
+                        log(key);
+                    }
+                }
             }
         }
         return newLabels;

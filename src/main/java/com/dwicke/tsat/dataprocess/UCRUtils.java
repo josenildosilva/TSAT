@@ -48,15 +48,15 @@ public class UCRUtils {
 				num = parseValue(label);
 			}
 			String seriesType = label;
-			if (!(Double.isNaN(num))) {
-				seriesType = String.valueOf(num.intValue());
-			}
+//			if (!(Double.isNaN(num))) {
+//				seriesType = String.valueOf(num.intValue());
+//			}
 			double[] series = new double[split.length - 1];
 			for (int i = 1; i < split.length; i++) {
 				series[i - 1] = Double.valueOf(split[i].trim());
 			}
 			
-			TSProcessor tsp = new TSProcessor();
+//			TSProcessor tsp = new TSProcessor();
 
 			if (!res.containsKey(seriesType)) {
 				res.put(seriesType, new ArrayList<>());
