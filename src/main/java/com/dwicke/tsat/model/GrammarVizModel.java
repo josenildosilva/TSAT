@@ -492,6 +492,19 @@ public class GrammarVizModel extends Observable implements Observer {
     try {
 
       Object[] objData = LoadTSDataset.loadData("0", filename, true);
+
+      if ((int)objData[0] == LoadTSDataset.JSON) {
+
+        TDAProcessing tdaProc = new TDAProcessing("0", filename, false);
+        // this is a multivariate ts so need to notify observers
+        setChanged();
+        notifyObservers(new GrammarVizMessage(GrammarVizMessage.TDA_TEST_JSON_SELECTED, tdaProc));
+        return;
+
+
+      }
+
+
       if ((int)objData[0] != LoadTSDataset.singleTS) {
         this.enableRPM = true; // the single time ts is the only one that isn't classification
         this.RPMLabels =  (String []) ((Object[]) objData[1])[1];

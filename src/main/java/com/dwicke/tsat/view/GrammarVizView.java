@@ -958,6 +958,23 @@ public class GrammarVizView implements Observer, ActionListener {
 
 
 
+      } else if (GrammarVizMessage.TDA_TEST_JSON_SELECTED.equalsIgnoreCase(message.getType())) {
+
+        TDAProcessing tdaProc = (TDAProcessing) message.getPayload();
+
+        TDAArgsPane parametersPanel = new TDAArgsPane(
+                tdaProc);
+
+        TDAArgsDialog parametersDialog = new TDAArgsDialog(frame, parametersPanel,
+                tdaProc);
+
+        parametersDialog.setVisible(true);
+
+        // then get the file to store the univariate data in
+        this.controller.getTestTDAController(tdaProc).actionPerformed(new ActionEvent(this, 0, null));
+
+
+
       }
     }
   }

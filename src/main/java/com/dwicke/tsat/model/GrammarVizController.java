@@ -238,6 +238,28 @@ public class GrammarVizController extends Observable implements ActionListener {
         return tdaController;
     }
 
+    public ActionListener getTestTDAController(TDAProcessing tdaProcessing) {
+        ActionListener tdaController = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Univariate Time Series Test Save Location");
+
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    tdaProcessing.setUnivariateTSLocation(file.getAbsolutePath());
+                    // convert to univariate data
+                    tdaProcessing.multiToUniTDAProc();
+                    // load the dataset into the view
+                    model.RPMTest(file.getAbsolutePath());
+                }
+
+            }
+        };
+
+        return tdaController;
+    }
+
 
 
     @Override
