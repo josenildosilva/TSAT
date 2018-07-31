@@ -1,10 +1,11 @@
 package com.dwicke.tsat.rpm.util;
 
+import weka.classifiers.Evaluation;
+
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by David Fleming on 12/2/16.
  *
  * This class stores the results from testing.
  */
@@ -21,6 +22,12 @@ public class ClassificationResults {
 
     // This is the timeseries data indexed corresponding to weka results
     public double[][] testDataTS;
+
+
+    public Evaluation evalResults;
+    public boolean unlabeledData = false;
+    public int numClasses;
+
 
     /**
      * Function to generate formatted string suitable for printing.

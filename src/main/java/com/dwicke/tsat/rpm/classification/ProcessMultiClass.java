@@ -59,11 +59,11 @@ public class ProcessMultiClass {
 
 		if(results != null) {
 			StringBuffer output = new StringBuffer();
-			error = classifyTransformedData(transformedTrainTS, transformedTestTS, output);
+			error = classifyTransformedData(transformedTrainTS, transformedTestTS, output, results);
 			//results.
 			results.results = output.toString();
 		} else {
-            error = classifyTransformedData(transformedTrainTS, transformedTestTS, null);
+            error = classifyTransformedData(transformedTrainTS, transformedTestTS, null, results);
         }
 
 		//consoleLogger.info("Classification Accuracy: " + String.valueOf(error));
@@ -320,7 +320,7 @@ public class ProcessMultiClass {
 
 
 
-	public double classifyTransformedData(double[][] trainData, double[][] testData, StringBuffer output) {
+	public double classifyTransformedData(double[][] trainData, double[][] testData, StringBuffer output, ClassificationResults classificationResults) {
 
 		Instances train = buildArff(trainData);
 		Instances test = buildArff(testData, trainData, train);
@@ -361,11 +361,12 @@ public class ProcessMultiClass {
 				System.out.println("Weighted MCC = " + eval.weightedMatthewsCorrelation());
 
 				System.out.println(eval.toMatrixString());
-
-
+				classificationResults.numClasses = train.numClasses();
+				classificationResults.evalResults = eval;
 
 				return eval.errorRate();
 			}
+			classificationResults.unlabeledData = true;
 			output.append("#\n");
 			int instNum = 1;
 			for (Instance i : test) {

@@ -161,6 +161,7 @@ public class GrammarVizView implements Observer, ActionListener {
   private GrammarVizRPMPanel rpmPanel;
   private GrammarVizRPMRepPanel rpmRepPanel;
   private GrammarVizRPMTSPanel rpmTSPanel;
+  private RPMStatisticsPanel rpmStatisticsPanel;
 
   // rule(s) charting auxiliary panel
   //
@@ -665,6 +666,12 @@ public class GrammarVizView implements Observer, ActionListener {
     rpmTSPanel.setLayout(rpmTSPanelLayout);
     tabbedRulesPane.addTab("RPM Time Series Results", null, rpmTSPanel, "Show RPM Classification Time Series");
 
+    // now add the RPM Statistics Panel
+    rpmStatisticsPanel = new RPMStatisticsPanel();
+    MigLayout rpmStatsPanelLayout = new MigLayout(",insets 0 0 0 0", "[fill,grow]", "[fill,grow]");
+    rpmStatisticsPanel.setLayout(rpmStatsPanelLayout);
+    tabbedRulesPane.addTab("RPM Statistics", null, rpmStatisticsPanel, "Show RPM Classification Statistics");
+
 
 
     // now format the tabbed pane
@@ -906,6 +913,8 @@ public class GrammarVizView implements Observer, ActionListener {
             rpmPanel.repaint();
             rpmTSPanel.revalidate();
             rpmTSPanel.repaint();
+            rpmStatisticsPanel.revalidate();
+            rpmStatisticsPanel.repaint();
             saxParametersPane.revalidate();
             saxParametersPane.repaint();
             rpmRepPanel.updateRPMRepPatterns();
@@ -929,6 +938,11 @@ public class GrammarVizView implements Observer, ActionListener {
             rpmTSPanel.setClassificationResults(controller.getSession());
             rpmTSPanel.updateRPMStatistics();
             rpmTSPanel.resetPanel();
+
+            // here have another panel with a nice big text box and i print all of the confusion matrix stuff...
+            rpmStatisticsPanel.setClassificationResults(controller.getSession());
+            rpmStatisticsPanel.updateRPMStatistics();
+            rpmStatisticsPanel.resetPanel();
           }
         };
         SwingUtilities.invokeLater(updateTable);
