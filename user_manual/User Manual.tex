@@ -84,6 +84,9 @@ ypos=50
 	tabsize=3
 }
 
+\usepackage{minted}
+
+
 \graphicspath{{pictures/}}
 \newcommand\TSAT{\textbf{TSAT}}
 \newcommand\TSATVERSION{1.0}
@@ -348,7 +351,37 @@ In order to perform motif discovery in TSAT the time series must be formatted in
 	42\\
 \end{allintypewriter}
 
-\vspace{-3em}
+\paragraph{Multiattribute Time Series Format}
+
+{\TSAT} also handles multiattribute timeseries data however the format is in JSON (JavaScript Object Notation).  The format is
+
+\begin{minted}{js}
+	[
+	{
+		"timeSeries":[
+		{
+			"data":[
+			2.0,
+			100.3,
+			10.4,
+			11.4
+			]
+		},
+		{
+			"data":[
+			12.0,
+			90.3,
+			70.4,
+			31.4
+			]
+		}
+		]
+	}
+	]
+\end{minted}
+
+This is a two attribute time series.  Each time series must have the same length and is contained in the array labeled ``data''.  Also, ``json'' must be present in the filename, e.g. ``awesomeMTS.json''.
+
 \subsection{Guide to Motif Discovery}
 %1. Browse for the time series data file and click load data in the data source section
 %2. Set the SAX parameters
@@ -698,10 +731,10 @@ TSAT implements Representative Pattern Mining or RPM  (see Section~\ref{RPMOverv
 The standard method to train a supervised learning classifier is to take the labeled dataset and split it into two datasets, training and testing data.  One common way to split the data is to have 80\% training and 20\% testing.  
 
 \paragraph{Training Data}
-Training data is the primary data and will be used to create a model that can identify similar patterns in new, unlabeled, data. This data must have a label for each time series so that RPM can learn what the labels can look like. This is where the bulk of the data should be set aside for as RPM will need many samples to find representative patterns.
+Training data is the primary data and will be used to create a model that can identify similar patterns in new, unlabeled, data. This data must have a label for each time series so that RPM can learn what the labels can look like.  For RPM to work there must be more than one training label and there must be more than one example for each of the different training labels. This is where the bulk of the data should be set aside for as RPM will need many samples to find representative patterns.
 
 \paragraph{Testing Data}
-Testing data is a small subset of the data usually from the same source as the training data, but not found in the training data. This set of data will be used to test the model that RPM made for accuracy or to predict labels for unlabeled test data.
+Testing data is a small subset of the data usually from the same source as the training data, but not found in the training data. This set of data will be used to test the model that RPM made for accuracy or some other statistic or to predict labels for unlabeled test data.
 
 Splitting data into a training and a test set is beyond the scope of this manual and is not done by TSAT. The goal of this section is to first detail the proper file formats for training and testing data in Section~\ref{RPMFile}. Then the proper procedures to train (Section~\ref{RPMTrain}) and test (Section~\ref{RPMTest})are presented step by step along then with a number of other useful features. 
 
@@ -742,8 +775,7 @@ Another acceptable format is the row format.  This format is especially useful  
 In this example the labels are ``1'' and ``two'' and the time series follow after the labels.
 
 \paragraph{ARFF Formatted data}
-
-A standard format for many public time series datasets is the ARFF file format.  For example, \url{http://timeseriesclassification.com/dataset.php} has a number of time series in ARFF format that can be used in TSAT.  ARFF files are more complicated than both the column and row formats, but is more widely used outside TSAT.  Here is an abbreviated example ARFF file:\\
+A standard format for many public time series datasets is the ARFF file format.  This file format is accepted in {\TSAT} though the file must contain ``arff'' in the filename, e.g. ``awesomeTS.arff''.  Also, \url{http://timeseriesclassification.com/dataset.php} has a number of time series in ARFF format that can be used in TSAT.  ARFF files are more complicated than both the column and row formats, but is more widely used outside TSAT.  Here is an abbreviated example ARFF file:\\
 \begin{samepage}
 \begin{allintypewriter}
 	\noindent @relation Adiac\\ \\
@@ -757,7 +789,72 @@ A standard format for many public time series datasets is the ARFF file format. 
 	...
 \end{allintypewriter}
 \end{samepage}
-The ARFF file begins with the name of the dataset Adiac by using the ARFF formatting by putting it after the \texttt{@relation} element. After the name of the dataset each timestep is listed as an attribute \texttt{@attribute <timestepName> numeric} where you can choose what to name each timestep. After listing the timesteps as attributes the labels are listed as the target attribute \texttt{@attribute target \{1, 2, ...\}} where these are the labels for the time series. Finally, the time series data is in comma separated value (CSV) format following the \texttt{@data} line.  Each value in a time series is separated by a comma on a single line and the last value on the line is the label for the time series.
+The ARFF file begins with the name of the dataset (above the name is Adiac) by using the ARFF formatting by putting it after the \texttt{@relation} element. After the name of the dataset each timestep is listed as an attribute \texttt{@attribute <timestepName> numeric} where you can choose what to name each timestep. After listing the timesteps as attributes the labels are listed as the target attribute \texttt{@attribute target \{1, 2, ...\}} where these are the labels for the time series. Finally, the time series data is in comma separated value (CSV) format following the \texttt{@data} line.  Each value in a time series is separated by a comma on a single line and the last value on the line is the label for the time series.
+
+\paragraph{Multiattribute Time Series Data}
+For a multiattribute time series the data is formatted in a JSON (Javascript Object Notation) file.  Like arff files, json must be present in the filename, e.g. ``awesomeMTS.json''.  There is at the point of this manual no recognized standard for multivariate time series data.  ARFF files are a bit cumbersome to use when dealing with multiattribute timeseries.  Therefore, {\TSAT} uses JSON format which is much easier to use.  
+
+An example of the format is:
+\begin{minted}{js}
+[  
+{  
+	"timeSeries":[  
+	{  
+		"data":[  
+		2.0,
+		100.3,
+		10.4,
+		11.4
+		]
+	},
+	{  
+		"data":[  
+		12.0,
+		90.3,
+		70.4,
+		31.4
+		]
+	}
+	],
+	"label":"1"
+},
+{  
+	"timeSeries":[  
+	{  
+		"data":[  
+		20.0,
+		10.5,
+		109.4,
+		14.6
+		]
+	},
+	{  
+		"data":[  
+		112.8,
+		23.1,
+		64.1,
+		32.7
+		]
+	}
+	],
+	"label":"1"
+}
+]
+\end{minted}
+The above can be viewed as an array of MultivariateTimeSeries objects.  Where the Java class definition is below.
+\begin{minted}{java}
+	private class MultiVariateTimeSeries {
+		public TimeSeries[] timeSeries;
+		public String label = null;
+	}
+	
+	private class TimeSeries {
+		protected double[] data = null;
+	}
+	
+\end{minted}
+
+Each multiattribute or multivariate timeseries consists of an array of the time series and the associated label.  As always there must be more than one class label (therefore the above is not valid for RPM since ``1'' is the only label) and there must be more than one example for each class label.
 
 \paragraph{Unknown Test Data}
 In column, row, or ARFF format when predicting unlabeled test data, the test data must be labeled as ``?'' (note that there must only be test data that is labeled with a ``?'').  For example, a row formatted test dataset might be:

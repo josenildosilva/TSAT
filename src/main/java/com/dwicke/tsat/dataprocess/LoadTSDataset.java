@@ -137,13 +137,38 @@ public class LoadTSDataset {
     }
 
 
+    public MultiVariateTimeSeries[] getSampleMTS() {
+        MultiVariateTimeSeries a[] = new MultiVariateTimeSeries[2];
+        a[0] = new MultiVariateTimeSeries();
+        a[0].label = "1";
+        a[0].timeSeries = new TimeSeries[2];
+
+        a[0].timeSeries[0] = new TimeSeries();
+        a[0].timeSeries[0].data = new double[]{2.0, 100.3, 10.4, 11.4};
+
+
+        a[0].timeSeries[1] = new TimeSeries();
+        a[0].timeSeries[1].data = new double[]{12.0, 90.3, 70.4, 31.4};
+
+        a[1] = new MultiVariateTimeSeries();
+        a[1].label = "1";
+        a[1].timeSeries = new TimeSeries[2];
+
+        a[1].timeSeries[0] = new TimeSeries();
+        a[1].timeSeries[0].data = new double[]{20.0, 10.5, 109.4, 14.6};
+
+        a[1].timeSeries[1] = new TimeSeries();
+        a[1].timeSeries[1].data = new double[]{112.8, 23.1, 64.1, 32.7};
+        return a;
+    }
+
     public static void main(String args[]) throws IOException {
 
 
         LoadTSDataset d = new LoadTSDataset();
-        String jsondata = new Gson().toJson(d.getSampleTS());
+        String jsondata = new Gson().toJson(d.getSampleMTS());
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/drew/Desktop/TSATtutorial/mtsECG/sampleSingle.json"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/drew/Desktop/TSATtutorial/mtsECG/sampleMultiLabel.json"));
         writer.write(jsondata);
 
         writer.close();
@@ -151,7 +176,7 @@ public class LoadTSDataset {
 
         int typeofJSON = -2;
         try {
-            typeofJSON = loadJSON("/home/drew/Desktop/TSATtutorial/mtsECG/sampleSingle.json");
+            typeofJSON = loadJSON("/home/drew/Desktop/TSATtutorial/mtsECG/sampleMultiLabel.json");
         } catch (Exception e) {
             e.printStackTrace();
         }
