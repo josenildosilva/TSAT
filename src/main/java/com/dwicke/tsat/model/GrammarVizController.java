@@ -1,12 +1,15 @@
 package com.dwicke.tsat.model;
 
 import com.dwicke.tsat.dataprocess.TDAProcessing;
+import net.seninp.util.StackTrace;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Observable;
 
 /**
@@ -67,7 +70,13 @@ public class GrammarVizController extends Observable implements ActionListener {
     public ActionListener getLoadFileListener() {
         ActionListener loadDataActionListener = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                model.loadData(e.getActionCommand());
+                try {
+                    model.loadData(e.getActionCommand());
+                } catch (Exception e1) {
+                    setChanged();
+                    notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
+                            "Error while loading RPM model: " + model.getDataFileName() + " " + StackTrace.toString(e1)));
+                }
             }
         };
         return loadDataActionListener;
@@ -229,7 +238,13 @@ public class GrammarVizController extends Observable implements ActionListener {
                     tdaProcessing.multiToUniTDAProc();
                     // load the dataset into the view
                     model.setDataSource(file.getAbsolutePath());
-                    model.loadData(tdaProcessing.getLineLimit());
+                    try {
+                        model.loadData(tdaProcessing.getLineLimit());
+                    } catch (Exception e1) {
+                        setChanged();
+                        notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
+                                "Error while loading: " + model.getDataFileName() + " " + StackTrace.toString(e1)));
+                    }
                 }
 
             }

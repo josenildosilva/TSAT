@@ -29,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.*;
 import java.util.zip.DataFormatException;
 
@@ -99,20 +100,18 @@ public class GrammarVizModel extends Observable implements Observer {
    * 
    * @param limitStr the limit of lines to read.
    */
-  public synchronized void loadData(String limitStr) {
+  public synchronized void loadData(String limitStr) throws FileNotFoundException, ParseException {
 
     Object[] objData = LoadTSDataset.loadData(limitStr, this.dataFileName, false);
 
 
-    if ((int)objData[0] == LoadTSDataset.JSON) {
+    if ((int)objData[0] == LoadTSDataset.JSONRPM || (int)objData[0] == LoadTSDataset.JSONSINGLE) {
 
       TDAProcessing tdaProc = new TDAProcessing(limitStr, this.dataFileName, false);
       // this is a multivariate ts so need to notify observers
       setChanged();
       notifyObservers(new GrammarVizMessage(GrammarVizMessage.TDA_JSON_SELECTED, tdaProc));
       return;
-
-
     }
 
     if (((Object[]) objData[1]) == null) {
@@ -122,7 +121,7 @@ public class GrammarVizModel extends Observable implements Observer {
     }
 
 
-    if ((int)objData[0] != LoadTSDataset.singleTS) {
+    if ((int)objData[0] != LoadTSDataset.singleTS && (int)objData[0] != LoadTSDataset.JSONSINGLE) {
       this.enableRPM = true; // the single time ts is the only one that isn't classification
       this.RPMLabels =  (String []) ((Object[]) objData[1])[1];
     }
@@ -399,11 +398,17 @@ public class GrammarVizModel extends Observable implements Observer {
    * @param filename the path to the training time series data.
    * @return true if the file was found and loaded, false otherwise.
    */
-  private boolean loadTrainingDataForModel(String filename) throws IOException{
+  private boolean loadTrainingDataForModel(String filename) {
     String tempDataFileName = this.dataFileName;
     this.dataFileName = filename;
 
-    this.loadData("0");
+    try {
+      this.loadData("0");
+    } catch (Exception e) {
+      setChanged();
+      notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
+              "Error while loading training data for model: " + this.dataFileName + " " + StackTrace.toString(e)));
+    }
 
     if(!(this.ts == null)) {
       this.rpmHandler.setTrainingData(this.ts);
@@ -474,7 +479,7 @@ public class GrammarVizModel extends Observable implements Observer {
       } else {
         this.rpmHandler = null;
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       setChanged();
       notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
               "Error while loading RPM model: " + this.dataFileName + " " + StackTrace.toString(e)));
@@ -493,20 +498,18 @@ public class GrammarVizModel extends Observable implements Observer {
 
       Object[] objData = LoadTSDataset.loadData("0", filename, true);
 
-      if ((int)objData[0] == LoadTSDataset.JSON) {
+      if ((int)objData[0] == LoadTSDataset.JSONRPM || (int)objData[0] == LoadTSDataset.JSONSINGLE) {
 
         TDAProcessing tdaProc = new TDAProcessing("0", filename, false);
         // this is a multivariate ts so need to notify observers
         setChanged();
         notifyObservers(new GrammarVizMessage(GrammarVizMessage.TDA_TEST_JSON_SELECTED, tdaProc));
         return;
-
-
       }
 
 
-      if ((int)objData[0] != LoadTSDataset.singleTS) {
-        this.enableRPM = true; // the single time ts is the only one that isn't classification
+      if ((int)objData[0] != LoadTSDataset.singleTS && (int)objData[0] != LoadTSDataset.JSONSINGLE) {
+        this.enableRPM = true; // the single timeserie and jsonsingle are the only ones that aren't classification
         this.RPMLabels =  (String []) ((Object[]) objData[1])[1];
       }
       double[][] testData = (double[][]) ((Object[]) objData[1])[0];
@@ -518,18 +521,22 @@ public class GrammarVizModel extends Observable implements Observer {
         this.rpmHandler.RPMTestData(filename, testData, this.RPMLabels);
         setChanged();
         notifyObservers(new GrammarVizMessage(GrammarVizMessage.RPM_CLASS_RESULTS_UPDATE_MESSAGE, this.rpmHandler));
-        this.log("Finished testing see tabs labeled RPM Classification and RPM Time Series Results for result info");
+        this.log("Finished testing see tabs labeled RPM Statistics, RPM Classification, and RPM Time Series Results for result info");
         //this.log("RPM Testing Results: " + results.toString());
       } else {
-        this.log("Not RPM Data");
+        setChanged();
+        notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
+                "The file " + this.dataFileName + " does not contain RPM data"));
       }
     } catch (IOException e) {
       setChanged();
       notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
-              "Error while loading RPM model: " + this.dataFileName + " " + StackTrace.toString(e)));
+              "Error while loading RPM file: " + this.dataFileName + " " + StackTrace.toString(e)));
     } catch (Exception e) {
-      this.log("error while testing RPM model " + StackTrace.toString(e));
-      e.printStackTrace();
+
+      setChanged();
+      notifyObservers(new GrammarVizMessage(GrammarVizMessage.LOAD_FILE_ERROR_UPDATE_MESSAGE,
+              "Error while loading the testing RPM file: " + this.dataFileName + " " + StackTrace.toString(e)));
     }
   }
 

@@ -1,6 +1,9 @@
 package com.dwicke.tsat.dataprocess;
 
 import com.dwicke.tsat.cli.RPM.TSATRPM;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import net.seninp.util.StackTrace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,9 +11,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffLoader;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.server.RMIClassLoader;
+import java.text.ParseException;
 import java.util.*;
 import java.util.zip.DataFormatException;
 
@@ -27,7 +29,9 @@ public class LoadTSDataset {
     public static final int colRPM = 1;
     public static final int rowRPM = 2;
     public static final int ARFF = 3;
-    public static final int JSON = 4;
+    private static final int JSON = 4;
+    public static final int JSONRPM = 5; // with classes means that there are labels or ? labels
+    public static final int JSONSINGLE = 6; // means doesn't have class labels or ? labels
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadTSDataset.class);
 
@@ -71,21 +75,22 @@ public class LoadTSDataset {
 
 
 
-    public static Object[] loadData(String limitStr, String fileName, boolean isTestDataset) {
+    public static Object[] loadData(String limitStr, String fileName, boolean isTestDataset) throws ParseException, FileNotFoundException {
         // check if everything is ready
         if ((null == fileName) || fileName.isEmpty()) {
-            log("unable to load data - no data source selected yet");
-            return null;
+//            log("unable to load data - no data source selected yet");
+//            return null;
+            throw new FileNotFoundException("Unable to load data - no data source selected yet.");
         }
 
 
         // make sure the path exists
         Path path = Paths.get(fileName);
         if (!(Files.exists(path))) {
-            log("file " + fileName + " doesn't exist.");
-            return null;
+//            log("file " + fileName + " doesn't exist.");
+//            return null;
+            throw new FileNotFoundException("file " + fileName + " doesn't exist.");
         }
-
 
         int formatStyle = getFormat(fileName);
 
@@ -97,15 +102,97 @@ public class LoadTSDataset {
         else if (formatStyle == ARFF) {
             return new Object[] {formatStyle, loadARFF(fileName, isTestDataset)};
         } else if (formatStyle == JSON) {
-            return new Object[] {formatStyle, fileName, isTestDataset};
+            // now I need to check if it is for RPM or not
+            // I do so by loading the json and checking if it contains class labels
+            return new Object[] {loadJSON(fileName), fileName, isTestDataset};
         }
 
         return null;
     }
 
+    private class MultiVariateTimeSeries {
+
+        public TimeSeries[] timeSeries;
+        public String label = null;
+    }
 
 
-    public static Object[] loadARFF(String fileName, boolean isTestDataset) {
+    private class TimeSeries {
+
+        protected double[] data = null;
+
+    }
+
+    public MultiVariateTimeSeries[] getSampleTS() {
+        MultiVariateTimeSeries a[] = new MultiVariateTimeSeries[1];
+        a[0] = new MultiVariateTimeSeries();
+        a[0].timeSeries = new TimeSeries[2];
+
+        a[0].timeSeries[0] = new TimeSeries();
+        a[0].timeSeries[0].data = new double[]{2.0, 100.3, 10.4, 11.4};
+
+        a[0].timeSeries[1] = new TimeSeries();
+        a[0].timeSeries[1].data = new double[]{12.0, 90.3, 70.4, 31.4};
+        return a;
+    }
+
+
+    public static void main(String args[]) throws IOException {
+
+
+        LoadTSDataset d = new LoadTSDataset();
+        String jsondata = new Gson().toJson(d.getSampleTS());
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/home/drew/Desktop/TSATtutorial/mtsECG/sampleSingle.json"));
+        writer.write(jsondata);
+
+        writer.close();
+
+
+        int typeofJSON = -2;
+        try {
+            typeofJSON = loadJSON("/home/drew/Desktop/TSATtutorial/mtsECG/sampleSingle.json");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.err.println(typeofJSON);
+    }
+
+    public static int loadJSON(String filename) throws ParseException, FileNotFoundException{
+
+
+            MultiVariateTimeSeries[] mvTS = new Gson().fromJson(new JsonReader(new FileReader(filename)), MultiVariateTimeSeries[].class);
+
+            if (mvTS == null) {
+                // then gson was unable to parse the file
+                throw new ParseException("Error when parsing json file.  Not a valid format.",0);
+            }
+
+            for (int i = 0; i < mvTS.length; i++) {
+                if (mvTS[i].label == null && (mvTS[i].timeSeries == null || mvTS[i].timeSeries.length == 0)) {
+                    throw new ParseException("Error when parsing json time series.  Found an unlabeled and empty time series at index: " + i, i);
+                }
+                for (int j = 0; j < mvTS[i].timeSeries.length; j++) {
+                    if (mvTS[i].timeSeries[j].data == null || mvTS[i].timeSeries[j].data.length == 0) {
+                        throw new ParseException("Error when parsing json time series.  Invalid/empty or missing timeseries data within timeseries " + i, i);
+                    }
+                }
+            }
+
+            if (mvTS[0].label == null) {
+                // no labels are present
+                return JSONSINGLE;
+            }else {
+                // labels were present so go ahead and say it is RPM compatible
+                return JSONRPM;
+            }
+
+    }
+
+
+
+    public static Object[] loadARFF(String fileName, boolean isTestDataset) throws ParseException{
         Path path = Paths.get(fileName);
 
         try {
@@ -129,11 +216,11 @@ public class LoadTSDataset {
             return new Object[] {dataset, RPMLabels};
 
         } catch(IOException e) {
-            return null;
+            throw new ParseException("Error loading the arff file " + fileName, 0);
         }
     }
 
-    public static Object[] loadRowTS(String fileName, boolean isTestDataset) {
+    public static Object[] loadRowTS(String fileName, boolean isTestDataset) throws ParseException{
         try {
             Map<String, List<double[]>> data =  UCRUtils.readUCRData(fileName);
             int numEntries = 0;
@@ -162,23 +249,24 @@ public class LoadTSDataset {
 
         }catch(Exception e) {
             String stackTrace = StackTrace.toString(e);
-            log("error while trying to read data from " + fileName + ":\n " + e.getMessage() + " \n" + stackTrace);
-
-            return null;
+            //log("error while trying to read data from " + fileName + ":\n " + e.getMessage() + " \n" + stackTrace);
+            throw new ParseException("error while trying to read data from " + fileName + ":\n " + e.getMessage() + " \n" + stackTrace, 0);
         }
     }
 
-    public static Object[] loadDataColumnWise(String limitStr, String fileName, boolean isTestDataset) {
+    public static Object[] loadDataColumnWise(String limitStr, String fileName, boolean isTestDataset) throws ParseException, FileNotFoundException{
         if ((null == fileName) || fileName.isEmpty()) {
-            log("unable to load data - no data source selected yet");
-            return null;
+//            log("unable to load data - no data source selected yet");
+//            return null;
+            throw new FileNotFoundException("unable to load data - no data source selected yet");
         }
 
         // make sure the path exists
         Path path = Paths.get(fileName);
         if (!(Files.exists(path))) {
-            log("file " + fileName + " doesn't exist.");
-            return null;
+//            log("file " + fileName + " doesn't exist.");
+//            return null;
+            throw new FileNotFoundException("file " + fileName + " doesn't exist.");
         }
 
         // read the input
@@ -257,8 +345,9 @@ public class LoadTSDataset {
         }
         catch (Exception e) {
             String stackTrace = StackTrace.toString(e);
-            log("error while trying to read data from " + fileName + ":\n" + stackTrace);
-            return null;
+//            log("error while trying to read data from " + fileName + ":\n" + stackTrace);
+//            return null;
+            throw new ParseException("error while trying to read data from " + fileName + ":\n" + stackTrace, 0);
         }
 
         double[][] output = null;

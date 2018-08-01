@@ -84,7 +84,7 @@ def multiToUniVar(mvTS, window, dt, pdim, maxrad):
 
 def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad):
     minLen = 1000
-    
+    wroteFirstLine = False
     
     if numLines <= 0:
         numLines = len(d)
@@ -116,9 +116,18 @@ def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad
         if len(mvTS) > 0:
             val ="{}".format(norms2normed.reshape(1,-1))
             val = val.strip('[]')
-            val = " ".join(val.splitlines())
-            label = d[i]['label']
-            data_out.write("{} {}\n".format(label, val))
+            if 'label' not in d[i]:
+                # then this is an unlabeled time series
+                val = " ".join(val.splitlines()).replace(' ', '\n')
+                data_out.write("{}".format(val))
+                break # only look at first time series if unlabeled
+            else:
+                if wroteFirstLine == False:
+                    data_out.write("#\n")
+                    wroteFirstLine = True
+                val = " ".join(val.splitlines())
+                label = d[i]['label']
+                data_out.write("{} {}\n".format(label, val))
 
 
 # In[ ]:
@@ -150,7 +159,6 @@ print(consolidate)
 
 # then do this with the requested files.
 with open(univarFile, 'w') as data_out:
-    data_out.write("#\n")
     with open(multivarFile) as json_data:
         d = json.load(json_data)
         parseJson(d, data_out,numLines, consolidate, window, dt, pdim, maxrad)
