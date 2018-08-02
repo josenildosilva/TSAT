@@ -335,7 +335,7 @@ If the features that represent anomalies are sparse and too far apart, then the 
 
 3600 points seems like it might be enough, but enough variations in the distances between points in a window must appear in order to display interesting variation in the score function/landscape \(L^p\) norms.
 
-This method should work better on multivariate timeseries that have complex, weak correlations between them, but Gidea \& Katz also showed that theoretically it should also be able to detect when independent time series drawn as random samples from the gamma distribution will show interesting scores indicating when the ``heat'' is turned up on the gamma shape parameter (flattening it).
+This method should work better on multivariate time series that have complex, weak correlations between them, but Gidea \& Katz also showed that theoretically it should also be able to detect when independent time series drawn as random samples from the gamma distribution will show interesting scores indicating when the ``heat'' is turned up on the gamma shape parameter (flattening it).
 
 One way to think about the features that the \(L^p\) norm is scoring that makes sense to me is a physical analogy: the more constrained the orbits of various particles in a dynamical system which are orbiting some 
 attractor at a fixed speed, the larger the probability of their interaction, and so more triangles, etc should form, leading to a higher \(L^p\) norm in dimension 1.  If the speed is turned up, and the sampling 
@@ -377,7 +377,7 @@ In order to perform motif discovery in TSAT the time series must be formatted in
 
 \paragraph{Multiattribute Time Series Format}
 
-{\TSAT} also handles multiattribute timeseries data however the format is in JSON (JavaScript Object Notation).  The format is
+{\TSAT} also handles multiattribute time series data however the format is in JSON (JavaScript Object Notation).  The format is
 
 \begin{minted}{js}
 	[
@@ -426,6 +426,28 @@ This is a two attribute time series.  Each time series must have the same length
 	\caption{Click ``Browse'' $\rightarrow$ select file and click ``OK'' $\rightarrow$ click ``Load data''.}
 	\label{fig:step1-browse}
 \end{figure}
+
+\paragraph{Step 1.1 Multiattribute}
+If the training data is a multiattribute time series (with ``json'' appearing in the filename), then when the button labeled ``Load Data'' is clicked the Topological Data Analysis dialog will appear.  This is illustrated in figure~\ref{fig:tda-args-dialogMotif}. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/TDA-args-dialog}
+	\caption{Topological Data Analysis dialog.}
+	\label{fig:tda-args-dialogMotif}
+\end{figure}
+
+Once the values are set in the dialog and ``Ok'' is clicked, a new file dialog box will appear.  This box requests the desired location and filename for the univariate time series data that will be generated from the multivariate time series data.  This is shown in figure~\ref{fig:univartssavelocMotif}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/univarTSSaveLoc}
+	\caption{Location and filename for the univariate time series that TDA creates.}
+	\label{fig:univartssavelocMotif}
+\end{figure}
+
+
+Once the file has been selected TDA will be run and the univariate time series will be created and the new univariate time series will be loaded into TSAT and displayed.  Now that the multivariate time series has been converted to a univariate time series , continue on with the following paragraph, ``Step 2''.
 
 
 \paragraph{Step 2 (Figure~\ref{fig:step2-loaded})} Set the SAX parameters, ``Window'', ``PAA'', and ``Alphabet'' manually in the ``SAX Parameters'' section and then click ``Discretize'' in the ``Run GI'' section to produce the motifs.  Also, note that you can adjust the numerosity reduction strategy from Exact to either Off or MINDIST and toggling the sliding window and global normalization. How to set the SAX parameters is discussed in Section~\ref{MotifSec}.
@@ -816,7 +838,7 @@ A standard format for many public time series datasets is the ARFF file format. 
 The ARFF file begins with the name of the dataset (above the name is Adiac) by using the ARFF formatting by putting it after the \texttt{@relation} element. After the name of the dataset each timestep is listed as an attribute \texttt{@attribute <timestepName> numeric} where you can choose what to name each timestep. After listing the timesteps as attributes the labels are listed as the target attribute \texttt{@attribute target \{1, 2, ...\}} where these are the labels for the time series. Finally, the time series data is in comma separated value (CSV) format following the \texttt{@data} line.  Each value in a time series is separated by a comma on a single line and the last value on the line is the label for the time series.
 
 \paragraph{Multiattribute Time Series Data}
-For a multiattribute time series the data is formatted in a JSON (Javascript Object Notation) file.  Like arff files, json must be present in the filename, e.g. ``awesomeMTS.json''.  There is at the point of this manual no recognized standard for multivariate time series data.  ARFF files are a bit cumbersome to use when dealing with multiattribute timeseries.  Therefore, {\TSAT} uses JSON format which is much easier to use.  
+For a multiattribute time series the data is formatted in a JSON (Javascript Object Notation) file.  Like arff files, json must be present in the filename, e.g. ``awesomeMTS.json''.  There is at the point of this manual no recognized standard for multivariate time series data.  ARFF files are a bit cumbersome to use when dealing with multiattribute time series.  Therefore, {\TSAT} uses JSON format which is much easier to use.  
 
 An example of the format is:
 \begin{minted}{js}
@@ -878,7 +900,7 @@ The above can be viewed as an array of MultivariateTimeSeries objects.  Where th
 	
 \end{minted}
 
-Each multiattribute or multivariate timeseries consists of an array of the time series and the associated label.  As always there must be more than one class label (therefore the above is not valid for RPM since ``1'' is the only label) and there must be more than one example for each class label.
+Each multiattribute or multivariate time series consists of an array of the time series and the associated label.  As always there must be more than one class label (therefore the above is not valid for RPM since ``1'' is the only label) and there must be more than one example for each class label.
 
 \paragraph{Unknown Test Data}
 In column, row, or ARFF format when predicting unlabeled test data, the test data must be labeled as ``?'' (note that there must only be test data that is labeled with a ``?'').  For example, a row formatted test dataset might be:
@@ -926,6 +948,30 @@ This should bring up the file browser prompt in figure \ref{fig:TSAT-training-st
 \paragraph{Step 3}
 After selecting the file press the button labeled ``Load Data'' and  TSAT will load the data and the graphs will be populated, and if the data is found to be RPM compatible data then the ``Train'' button should become available. The text field labeled ``Row Limit'' allows the user to limit the number of rows that are read in from file, for example if the file contains 100 rows the user could limit it to the first 50.
 
+\paragraph{Step 3.1 Multiattribute}
+
+If the training data is a multiattribute time series (with ``json'' appearing in the filename), then when the button labeled ``Load Data'' is clicked the Topological Data Analysis dialog will appear.  This is illustrated in figure~\ref{fig:tda-args-dialog}. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/TDA-args-dialog}
+	\caption{Topological Data Analysis dialog.}
+	\label{fig:tda-args-dialog}
+\end{figure}
+
+Once the values are set in the dialog and ``Ok'' is clicked, a new file dialog box will appear.  This box requests the desired location and filename for the univariate time series data that will be generated from the multivariate time series data.  This is shown in figure~\ref{fig:univartssaveloc}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/univarTSSaveLoc}
+	\caption{Location and filename for the univariate time series that TDA creates.}
+	\label{fig:univartssaveloc}
+\end{figure}
+
+
+Once the file has been selected TDA will be run and the univariate time series will be created and the new univariate time series will be loaded into TSAT and displayed.  Now that the multivariate time series has been converted to a univariate time series, continue on with the following paragraph, ``Step 3 continued''.
+
+\paragraph{Step 3 continued}
 If the time series data is successfully loaded then all of the time series will be graphed in the ``data display'' area.  The data can be zoomed in to by left clicking and dragging the mouse over the area you wish to zoom into.  In order to zoom back out, right click on the graph area, hover over ``Auto Range'' in the menu, and then click ``Both Axes.''  Other features available after right clicking are to save the plot, print, copy, zoom in, and zoom out, and auto range.  The purpose of this display is to allow the user to gain an intuition of what the time series data looks like.
 
 \begin{figure}[H]
@@ -968,6 +1014,28 @@ Click the ``Test'' button and a file browser prompt will appear, depending on ho
 	\label{fig:TSAT-testing-step-1}
 \end{figure}
 
+\paragraph{Step 1 Multiattribute}
+If the testing data is a multiattribute time series (with ``json'' appearing in the filename), then when the button labeled ``Test'' is clicked the Topological Data Analysis dialog will appear.  This is illustrated in figure~\ref{fig:tda-args-dialogTest}. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/TDA-args-dialog}
+	\caption{Topological Data Analysis dialog.}
+	\label{fig:tda-args-dialogTest}
+\end{figure}
+
+Once the values are set in the dialog and ``Ok'' is clicked, a new file dialog box will appear.  This box requests the desired location and filename for the univariate time series data that will be generated from the multivariate time series data.  This is shown in figure~\ref{fig:univartssavelocTest}.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{pictures/univarTSSaveLoc}
+	\caption{Location and filename for the univariate time series that TDA creates.}
+	\label{fig:univartssavelocTest}
+\end{figure}
+
+
+Once the file has been selected TDA will be run and the univariate time series will be created and the new univariate time series will be loaded into TSAT and displayed.  Now that the multivariate time series has been converted to a univariate time series {\TSAT} will proceed to perform the testing procedure.
+
 \newpage
 Once the testing is complete the tab labeled ``RPM Classification'' will be populated. This provides statistics on the effectiveness of the model by reporting the number of samples that were incorrectly labeled by the model.
 
@@ -991,7 +1059,7 @@ Once testing is completed comprehensive statistics are provided under the ``RPM 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=\textwidth]{"pictures/Time Series Analysis Tool: TSAT_RPMStats"}
-	\caption{}
+	\caption{Statistics are shown under the ``RPM Statistics'' tab in the text area.}
 	\label{fig:time-series-analysis-tool-tsatrpmstats}
 \end{figure}
 
