@@ -1241,9 +1241,45 @@ When running RPMTrainTest you will generate three files as output instead of 1.
 
 Files with the .train and .test extensions are the json of the python dictionaries as discussed in previous sections.  The last file can be imported into TSAT GUI as it is the same as the saved model in {\TSAT}. Example usage of all three functions are contained within tsail.py.
 
+
+\section{Python Multiattribute Time Series}
+If your time series is multiattribute then it must be converted to a univariate time series before being used with any of the motif, anomaly detection, or classification python {\TSAT} interfaces.  This conversion is implemented as a command line interface.  An example call:
+
+\begin{minted}{bash}
+python tdaInterface.py /home/drew/Desktop/TSATtutorial/mtsECG/ECG_TRAIN3.json
+ecgUnivar.train 1 50 1 2 1.0
+\end{minted}
+
+The help documentation is displayed when used with the -h flag.  The help is shown below.
+\begin{minted}{bash}
+
+usage: tdaInterface.py [-h] MVData UVData numL window dt p maxrad
+
+Topological Data Analysis tool to convert multivariate time series to
+univariate time series.
+
+positional arguments:
+MVData      The json file containing the multivariate time series dataset
+UVData      The name for the univariate time series data file created by
+this tool.
+numL        The number of examples to read from the multivariate time series
+file
+window      The width of the window to compute persistence on, will take up
+to this number of samples
+dt          number of samples to skip between points.
+p           integer (type of L^p norm to compute)
+maxrad      max distance between pairwise points to consider for the Rips
+complex
+
+optional arguments:
+-h, --help  show this help message and exit
+
+\end{minted}
+
+
 \section{Notes}
 ~\label{Notes}
-When training there must always be more than one example from each class label and there must be more than one label.
+When training there must always be more than one example from each class label and there must be more than one label.  A sample call to convert a multiattribute time series ECG\_TRAIN3.json to a univariate time series and store in file 
 
 \paragraph{Installation}
 
@@ -1267,7 +1303,46 @@ $ java -Xmx2g -jar target/tsat-{\TSATVERSION}-SNAPSHOT-jar-with-dependencies.jar
 
 The -Xmx2g allocates max of 2Gb of memory for the software.
 
+\paragraph{Topological Data Analysis Installation}
 
+In order to install the Topological Data Analysis tool we assume that an Anaconda environment is created with the name py36 with python 3.6 set as the python interpreter.  Now within the py36 conda enviroment do the following:
+
+\begin{minted}{bash}
+
+#dependencies (Linux assumed)
+#install in this order:
+
+conda install numpy, scipy, dill, matplotlib, pandas 
+
+# sklearn from pip
+pip install sklearn
+
+# tqdm from pip (progress meter widget)
+pip install tqdm
+
+#libboost-dev
+sudo apt-get install libboost-dev
+
+#dionysus2 from pip
+pip install dionysus
+
+\end{minted}
+
+There should be a .tsat file in your home directory that has set the correct folder locations in order to call the tdaInterface.py.  An example is given below that is also included with the source code in the root directory of the project.
+
+\begin{minted}{bash}
+source /home/$USER/anaconda2/etc/profile.d/conda.sh
+export tdaInterface="/home/${USER}/src/TSAT/src/main/resources/tdaInterface.py"
+function tda() {
+	conda activate py36
+	echo $CONDA_DEFAULT_ENV
+	python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7
+}
+
+export -f tda
+\end{minted}
+
+With the .tsat stored in the home directory which {\TSAT} will look for in order to execute TDA everything should work.
 
 \bibliographystyle{ieeetr}
 \bibliography{citations}

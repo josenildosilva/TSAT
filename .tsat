@@ -1,0 +1,11 @@
+# The location of the  anaconda installation
+# and the location of the tdaInterface should be set
+source /home/$USER/anaconda2/etc/profile.d/conda.sh
+export tdaInterface="/home/${USER}/src/TSAT/src/main/resources/tdaInterface.py"
+function tda() {
+   conda activate py36
+   echo $CONDA_DEFAULT_ENV
+   python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7
+}
+
+export -f tda
