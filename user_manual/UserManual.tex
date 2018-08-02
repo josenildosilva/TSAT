@@ -958,7 +958,7 @@ The time series data that is displayed in the ``Rule Subsequence'' area correspo
 \subsection{Testing}
 \label{RPMTest}
 Once the model has be trained it should be tested for accuracy, this will use a smaller dataset in the RPM compatible format to measure how well the model does. 
-
+\newpage
 \paragraph{Step 1}
 Click the ``Test'' button and a file browser prompt will appear, depending on how large the dataset is this may take a moment. 
 
@@ -985,6 +985,18 @@ Additionally, under the ``RPM Time Series Results'' tab shows the list of time s
 	\label{fig:TSAT-testing-step-3}
 \end{figure}
 
+\subsection{RPM Statistics}
+Once testing is completed comprehensive statistics are provided under the ``RPM Statistics'' tab shown in Figure~\ref{fig:time-series-analysis-tool-tsatrpmstats}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{"pictures/Time Series Analysis Tool: TSAT_RPMStats"}
+	\caption{}
+	\label{fig:time-series-analysis-tool-tsatrpmstats}
+\end{figure}
+
+
+
 \subsection{Testing Unlabeled Data}
 Using the same method for loading the test data when the data is labeled we can see the results for unlabeled data.  Here the test data labels are all question marks so the results will consist of the probability that the test example is in each of the different training classes and the predicted label.  For example, in figure \ref{fig:TSAT-Results-Unknown-Test} the solid box has the label probability for each class and dashed box has the predicted class label.
 \begin{figure}[H]
@@ -996,7 +1008,7 @@ Using the same method for loading the test data when the data is labeled we can 
 \subsection{Saving a Trained RPM Model}
 \label{RPMSaving}
 Creating a model can take some time and there for being able to save the model for later uses is a useful feature. Saving the RPM model will generate a file that can be loaded in later for further testing. One thing to note is that the saved model does not contain the training data however the training data is still needed when doing testing there for a copy of the training data must be retained.
-
+\newpage
 \paragraph{Step 1}
 Once a model has been trained, click the save model button, as in figure \ref{fig:TSAT-save-model-step-1}, a file browser prompt will appear.
 
