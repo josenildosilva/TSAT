@@ -49,15 +49,20 @@ public class TDAProcessing {
 //source /opt/anaconda3/etc/profile.d/conda.sh; conda activate base;
         //ProcessBuilder pb = new ProcessBuilder("bash", "-c", "source /home/drew/anaconda2/etc/profile.d/conda.sh;conda activate base; echo $CONDA_DEFAULT_ENV; conda execute -q /home/drew/src/TSAT/target/classes/testingPython.py ; echo hi");
         //ProcessBuilder pb = new ProcessBuilder("bash",file.getAbsolutePath(),multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(shouldConsolidate));
-        String command = String.format("source /home/${USER}/.tsat;tda %s %s %s %s %s %s %s", multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(shouldConsolidate));
+        int consolidateTS = 0;
+        if (shouldConsolidate == true) {
+            consolidateTS = 1;
+        }
+        String command = String.format("source /home/${USER}/.tsat;tda %s %s %s %s %s %s %s %s", multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(consolidateTS));
 
         ProcessBuilder pb = new ProcessBuilder("bash", "-c", command);
 
 
 
 
-        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        pb.redirectErrorStream(true);
+        //pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        //pb.redirectErrorStream(true);
+
         Process p = null;
         try {
             p = pb.start();

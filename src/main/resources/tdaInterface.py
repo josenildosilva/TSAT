@@ -68,8 +68,8 @@ def multiToUniVar(mvTS, window, dt, pdim, maxrad):
     shortenedAndLogDiff = []
     for ts in mvTS:
         newTS = ts[:minLength]
-        # shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
-        shortenedAndLogDiff.append(newTS)
+        shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
+        #shortenedAndLogDiff.append(newTS)
 
 
     stacked = np.stack(shortenedAndLogDiff, axis=-1)
@@ -142,24 +142,27 @@ parser.add_argument('window', help='The width of the window to compute persisten
 parser.add_argument('dt', help='number of samples to skip between points.',type=int)
 parser.add_argument('p', help='integer (type of L^p norm to compute)', default=2, type=int)
 parser.add_argument('maxrad', help='max distance between pairwise points to consider for the Rips complex', default=1.0, type=float)
-#parser.add_argument('--shouldConsolidate', help='If true will merge values in the time series that are less than 10 time steps appart', action="store_true")
+parser.add_argument('shouldConsolidate', help='If true will merge values in the time series that are less than 10 time steps appart', default=0, type=int)
 
 args = parser.parse_args()
 
 multivarFile = os.path.abspath(args.dataset)
 univarFile = os.path.abspath(args.univarDataset)
 numLines = args.numLines
-consolidate = False#args.shouldConsolidate
+if args.shouldConsolidate == 1:
+    consolidateTS = True
+else:
+    consolidateTS = False
 window = args.window
 dt = args.dt
 pdim = args.p
 maxrad = args.maxrad
 
-print(consolidate)
+print(consolidateTS)
 
 # then do this with the requested files.
 with open(univarFile, 'w') as data_out:
     with open(multivarFile) as json_data:
         d = json.load(json_data)
-        parseJson(d, data_out,numLines, consolidate, window, dt, pdim, maxrad)
+        parseJson(d, data_out,numLines, consolidateTS, window, dt, pdim, maxrad)
 
