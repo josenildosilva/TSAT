@@ -60,8 +60,8 @@ public class TDAProcessing {
 
 
 
-        //pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        //pb.redirectErrorStream(true);
+        pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+        pb.redirectErrorStream(true);
 
         Process p = null;
         try {

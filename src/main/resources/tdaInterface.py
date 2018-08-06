@@ -20,7 +20,7 @@ import os
 from sklearn.preprocessing import MinMaxScaler
 import json
 import argparse
-
+np.set_printoptions(threshold=np.nan)
 
 def consolidate(y):
     indexNonZero = np.nonzero(y)[0]
