@@ -1259,17 +1259,20 @@ Topological Data Analysis tool to convert multivariate time series to
 univariate time series.
 
 positional arguments:
-MVData      The json file containing the multivariate time series dataset
-UVData      The name for the univariate time series data file created by
-this tool.
-numL        The number of examples to read from the multivariate time series
-file
-window      The width of the window to compute persistence on, will take up
-to this number of samples
-dt          number of samples to skip between points.
-p           integer (type of L^p norm to compute)
-maxrad      max distance between pairwise points to consider for the Rips
-complex
+MVData             The json file containing the multivariate time series
+dataset
+UVData             The name for the univariate time series data file created
+by this tool.
+numL               The number of examples to read from the multivariate time
+series file
+window             The width of the window to compute persistence on, will
+take up to this number of samples
+dt                 number of samples to skip between points.
+p                  integer (type of L^p norm to compute)
+maxrad             max distance between pairwise points to consider for the
+Rips complex
+shouldConsolidate  If true will merge values in the time series that are
+less than 10 time steps appart
 
 optional arguments:
 -h, --help  show this help message and exit
@@ -1331,12 +1334,14 @@ pip install dionysus
 There should be a .tsat file in your home directory that has set the correct folder locations in order to call the tdaInterface.py.  An example is given below that is also included with the source code in the root directory of the project.
 
 \begin{minted}{bash}
+# The location of the  anaconda installation
+# and the location of the tdaInterface should be set
 source /home/$USER/anaconda2/etc/profile.d/conda.sh
 export tdaInterface="/home/${USER}/src/TSAT/src/main/resources/tdaInterface.py"
 function tda() {
 	conda activate py36
 	echo $CONDA_DEFAULT_ENV
-	python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7
+	python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7 $8
 }
 
 export -f tda
