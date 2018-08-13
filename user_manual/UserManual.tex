@@ -132,7 +132,7 @@ The main method for interacting with {\TSAT} in this user guide will be through 
 \end{figure}
 
 There are eleven regions in the main GUI used to set parameters, load files, and analyze results.  The nine main regions in the GUI have a rectangular outline around them with a label.  They include: ``Data Source'', ``SAX Parameters'', ``Numerosity reduction'', ``Run GI'', ``Run RPM'', ``Data display'', ``Grammar rules'', ``Rule Subsequences, normalized'', and ``Workflow management.''  The other two regions are the top menu bar (with ``File'', ``Settings'', and ``Help'') and the text area at the bottom of the GUI.  Presently, the items under ``Help'' do not have any meaningful functionality.  The text area at the bottom of the GUI is used to log useful information about the state of GUI.  That text area may also be referred to as the logging area.
-
+ 
 \subsection{Python Interface}
 \label{introPython}
 In addition to a Graphical User Interface, {\TSAT} also has a python interface.  This interface consists of wrappers of the major functionality of {\TSAT}'s GUI. 
@@ -216,7 +216,7 @@ where the subscripts are the window numbers.
 A simple example (not a time series) of a context free grammar is to take the following string ``a rose is a rose is a rose'' this can be converted to the following grammar rules:
 
 \begin{center}
-	S \(\rightarrow\) BBA\\
+	S \(\rightarrow\) AAB\\
 	A \(\rightarrow\) B is\\
 	B \(\rightarrow\) a rose\\
 \end{center}
@@ -243,7 +243,7 @@ RRA defines anomalous subsequences as \textit{discords} or the subsequences whos
 
 The approximate anomaly detection method is implemented using the rule density curve.  The value at each point in the rule density curve is the number of grammar rules that span or ``cover'' the corresponding point in the time series.  Therefore, ``rule density curve intervals that contain minimal values correspond to time series anomalies''~\cite{senin2015time}.  
 
-Both the exact and approximate methods can find variable length anomalies.  However, ``if the time series under analysis has low regularity (an issue that impacts the grammar’s hierarchy) or the discretization parameters are far from optimal and regularities are not conveyed into the discretized space, the rule density based anomaly discovery technique may fail to output true anomalies''~\cite{senin2015time}.  Therefore, using the exact approach is preferable.
+Both the exact and approximate methods can find variable length anomalies.  However, if the time series being analyzed is highly irregular (very few motifs) ``or the discretization parameters are far from optimal and regularities are not conveyed into the discretized space, the rule density based anomaly discovery technique may fail to output true anomalies''~\cite{senin2015time}. Therefore, using the exact approach is preferable.
 \paragraph{Setting the Parameters} The best advice is from~\cite{senin2015time}:
 
 \begin{quote}
@@ -287,8 +287,16 @@ In addition there are a number of means for describing the performance of the cl
 \begin{description}
 	\item[Accuracy] The accuracy of a classifier is the number correctly classified examples divided by the total number of examples. 
 	\item[Confusion Matrix] A confusion matrix is useful in describing fully the performance of the classifier and one is illustrated in table~\ref{confusionmatrix}.  Here there are two classes, negative and positive, and the confusion matrix describes the result of the classifier.  For example, if the class is actually positive and is predicted negative then the value of FN would increase by one.  Also, the values in the confusion matrix are used to calculate the F1 Measure and the Matthews correlation coefficient.
-	\item[F1 Measure] Or F1 score is defined as \(2\cdot \frac{\textrm{precision }\cdot \textrm{ recall}}{\textrm{precision }+\textrm{ recall}}\).  Where \[\textrm{precision } = \frac{\textrm{true positives}}{\textrm{true positives } + \textrm{ false positives}}\] and \[\textrm{recall } = \frac{\textrm{true positives}}{\textrm{true positives } + \textrm{false negatives }}\].  Where in a binary class true positives mean that a classifier correctly labeled an example, false positive means that a classifier labeled an example as this class when it was the other class, and false negative means it was this class when labeled the other class.  Therefore, a value of 1 is perfect precision and recall and 0 is the worst.
-	\item[Matthews correlation coefficient] This value takes into account true and false positives and negatives and is generally regarded as a balanced measure which can be used even if the classes are of very different sizes~\cite{MCC}.  It is defined as: \[\frac{TP\times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN+FP)(TN+FN)}} \]
+	\item[F1 Measure] Or F1 score is defined as \(2\cdot \frac{\textrm{precision }\cdot \textrm{ recall}}{\textrm{precision }+\textrm{ recall}}\).  Where \[\textrm{precision } = \frac{\textrm{true positives}}{\textrm{true positives } + \textrm{ false positives}}\] and \[\textrm{recall } = \frac{\textrm{true positives}}{\textrm{true positives } + \textrm{false negatives }}\]  Where in a binary class true positives mean that a classifier correctly labeled an example, false positive means that a classifier labeled an example as this class when it was the other class, and false negative means it was this class when labeled the other class.  Therefore, a value of 1 is perfect precision and recall and 0 is the worst.
+	\item[Matthews correlation coefficient MCC] This value takes into account true and false positives and negatives and is generally regarded as a balanced measure which can be used even if the classes are of very different sizes~\cite{MCC}.  It is defined as: \[\frac{TP\times TN - FP \times FN}{\sqrt{(TP + FP)(TP + FN)(TN+FP)(TN+FN)}} \] The values are between -1 and +1. +1 represents a perfect prediction, 0 no better than random prediction, and −1 indicates total disagreement between prediction and observation.
+	\item[Area Under the Curve AUC] The AUC is the area under the Receiver Operator Characteristic (ROC) curve.  The ROC curve is created by plotting the true positive rate (TPR) against the false positive rate (FPR) at various threshold settings.  When using normalized units, the area under the curve is equal to the probability that a classifier will rank a randomly chosen positive instance higher than a randomly chosen negative one (assuming 'positive' ranks higher than 'negative').  The AUC varies between 0 and 1 where .5 indicates an accuracy no better than chance and 1 meaning perfect accuracy~\cite{AUC}.
+	\item[Kappa statistic] This value measures the agreement between two raters who each classify N items into C mutually exclusive categories. It takes on values between 1 and negative infinity.  A value of 1 indicates perfect accuracy, 0 is no better than random, and negative value is worse than random~\cite{KAPPA}.
+	\item[Error] So, there are a number of measures for error in the prediction.  Such values include: Mean absolute error, Root mean squared error, Relative absolute error, and Root relative squared error.  Since RPM is performing classification on labeled categories, then the distance error measurements that are reported in TSAT should not be used.  This is because the distances are not relevant as the distances between the classes are not meaningful.  
+	\item[Weighted F1 Measure]  This value is the F1 scores for each of the classes weighted by the number of examples within each of the classes divided by the total number of examples.
+	\item[Weighted MCC]  This value is the MCC values for each of the classes weighted by the proportion of how many elements are in each class.
+	\item[Weighted AUC] This value is the AUC values for each of the classes weighted by the proportion of how many elements are in each class. 
+
+	
 \end{description}
 
 Accuracy is a flawed method for describing the performance of a classifier.  For example, consider the confusion matrix in table~\ref{confusionmatrix} where the accuracy is 90\%.  However, the F1 score is 0.1666 which indicates that the precision and recall is not performing well at all.  This is due to the imbalance of the datasets and rebalancing using a technique such as up-sampling should be used to balance the number of examples in each class.
@@ -545,9 +553,7 @@ Currently the Output tab does not affect the location of output files other than
 
 The clustering method prunes the motifs by classifying the subsequences by length and removing the overlapping in the same length range. This technique is accessed by clicking on the ``Cluster rules'' button in the Workflow management section of the GUI.
 
-Once clicked you are asked for ``threshold for length'' and a ``threshold for overlap.''  The threshold for overlap is not actually currently used.
-
-However the value for the threshold length is used and the subsequences with the length difference within threshold: ``threshouldLength'' will be classified as a class with the function ``classifyMotifs(double)'', i.e. 1-100 and 101-205 will be classified as a class when the threshold is 0.1, because the length difference is 5, which is less than the threshold (0.1 * 100 = 10). If two sub-sequences within one class share a common part which is more than the threshold: ``thresouldCom'', one of them will be removed by the function ``removeOverlappingInSimiliar(double)''. i.e. 1-100 and 21-120.
+Once clicked you are asked for ``threshold for length'' and a ``threshold for overlap.''  The threshold for overlap is not actually currently used. However the value for the threshold length is used. This value is a value between zero and one and states how similar the lengths of the sub=sequences need to be in order to be within the same class.  So, if the threshold is 0 then they must be exactly the same length and if one then they have to be at least as long as the sub-sequence being compared to.  So, a value of .1 (a distance of 10 for a length of 100 sub-sequence) is a pretty good standard.  Then within the classes if two sub-sequences are overlapping and the difference in the overlap is above some threshold then one of the sub-sequences will be pruned.
 
 Once finished the results are presented in the ``Regularized rules'' tab in ``Grammar Rules'' section.
 
@@ -679,7 +685,7 @@ After following the steps in Section~\ref{MotifGuide} of loading the dataset and
 
 
 
-By clicking on ``Settings'' and then ``TSAT options'' menu items and a dialog window will appear and you can choose a coverage strategy in the ``Coverage Strategy'' tab (shown in Figure~\ref{fig:coveragestrategy}). Changing the coverage strategy will change how the rule density is calculated.
+By clicking on ``Settings'' and then ``TSAT options'' menu items and a dialog window will appear and you can choose a coverage strategy in the ``Coverage Strategy'' tab (shown in Figure~\ref{fig:coveragestrategy}). Changing the coverage strategy will change how the rule density is calculated. The default is rule count which corresponds to the number of grammar rules that include that particular timestamp.  This is how rule density is usually calculated.  Other options include rule level increment, this corresponds to summing up the rule levels that each rule is at in the grammar at each timestamp.  Rule occurrence, corresponds to summing up the number of times this rule is applied in the time series.   Rule yield, corresponds to summing up the number of terminals that the particular grammar rule yields.  The product of level and occurrence is just the product of these two summed for each of the grammar rules at each timestamp.
 
 \begin{figure}[H]
 	\centering
@@ -981,7 +987,7 @@ If the time series data is successfully loaded then all of the time series will 
 \end{figure}
 
 \newpage
-Hitting this button will begin the training phase of RPM, this can take some time depending on the data and the number of iterations RPM will run. The text field labeled ``Iterations'' sets the maximum number of iterations RPM will go, this prevents RPM from running for to long trying to refine the model. Once the training is complete the tab ``RPM Representative Classes'' will become populated with patterns RPM thinks be represent the labels given. The fields ``Window'', ``PAA'', and ``Alphabet'' will also be populated with the values RPM believes are the best fit for the data to aid in further analysis. 
+Hitting the train button will begin the training phase of RPM, this can take some time depending on the data and the number of iterations RPM will run. The text field labeled ``Iterations'' sets the maximum number of iterations RPM will go, this prevents RPM from running for to long trying to refine the model. Once the training is complete the tab ``RPM Representative Classes'' will become populated with patterns RPM thinks be represent the labels given. The fields ``Window'', ``PAA'', and ``Alphabet'' will also be populated with the values RPM believes are the best fit for the data to aid in further analysis. 
 
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{TSAT-training-step-5}
@@ -1069,7 +1075,7 @@ Once testing is completed comprehensive statistics are provided under the ``RPM 
 Using the same method for loading the test data when the data is labeled we can see the results for unlabeled data.  Here the test data labels are all question marks so the results will consist of the probability that the test example is in each of the different training classes and the predicted label.  For example, in figure \ref{fig:TSAT-Results-Unknown-Test} the solid box has the label probability for each class and dashed box has the predicted class label.
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{RPMTimeSeriesResultsUnknown}
-	\caption{Solid box highlights the probability that the time series was in each of the different class labels and the dashed box highlights the predicted label.  For example, instance 1 has label probability values of 0.03, 0.9, and 0.07.  This means that the classifier claims that this instance is label 1 with probability 0.03, label 2 with probability of 0.09, and label 3 with probability 0.07. The predicted class is 2.  This can be interpreted as instance 1 being given label 2 since it has a probability of 0.9 (the highest probability) of being the correct label (according to the ``Label probability for each class'' column).  }
+	\caption{Solid box highlights the probability that the time series was in each of the different class labels and the dashed box highlights the predicted label.  For example, instance 1 has label probability values of 0.03, 0.9, and 0.07.  This means that the classifier claims that this instance is label 1 with probability 0.03, label 2 with probability of 0.9, and label 3 with probability 0.07. The predicted class is 2.  This can be interpreted as instance 1 being given label 2 since it has a probability of 0.9 (the highest probability) of being the correct label (according to the ``Label probability for each class'' column).  }
 	\label{fig:TSAT-Results-Unknown-Test}
 \end{figure}
 
@@ -1144,7 +1150,7 @@ There are a few options that can be changed when using RPM in TSAT, some of them
 \label{DTW}
 Dynamic Time Warping, or DTW, is a method of measuring distance between two time series, this means how similar or different they are to each other. By default RPM uses Euclidean distance which is a simple and fast measurement, however it does not do well when the similar patterns between time series occur at different positions. This is where DTW comes in, it can handle temporal shifts in patterns and, depending on the data, can vastly improve the accuracy of the model. There is a cost however, DTW is a much slower operation and is very expensive to run so it is left as an option for the user. 
 
-DTW also has another parameter called ``Window'' which can have dramatic effects on DTW both in how long it takes to run and its accuracy. The window size basically limits how far DTW will go to try to accurately try to match the two time series. A smaller window will stop DTW from trying to over match them and will take less time to compute. A larger window will take much longer to compute but can allow DTW to match patterns that are father apart. Choosing a good window size can be highly dependent on the data and what is being compared, and therefore some experimentation may be needed to find a good window size. There are a few good rules when choosing a window size, for one a window size greater then 10 will usually give bad results so 10 is considered a good starting point. Often for the more common types of data a 3-5 window size can be much better option with significant speed ups. Note DTW's window should not be confused with the Window size in the SAX parameters section of the main window, these are two different and distinct uses of the word window. 
+DTW also has another parameter called ``Window'' which can have dramatic effects on DTW both in how long it takes to run and its accuracy. The window size basically limits how far DTW will go to try to accurately try to match the two time series. A smaller window will stop DTW from trying to over match them and will take less time to compute. A larger window will take much longer to compute but can allow DTW to match patterns that are father apart. Choosing a good window size can be highly dependent on the data and what is being compared, and therefore some experimentation may be needed to find a good window size. However, there are a few good rules when choosing a window size. First, a window size greater than 10 will usually give bad results so 10 is considered a good starting point. Also, for more common types of data, a 3-5 window size can be a much better option with significant speed ups. Note, DTW's window should not be confused with the Window size in the SAX parameters section of the main window, these are two different and distinct uses of the word window. 
 
 %\newpage
 \paragraph{Step 1}
@@ -1247,13 +1253,13 @@ If your time series is multiattribute then it must be converted to a univariate 
 
 \begin{minted}{bash}
 python tdaInterface.py /home/drew/Desktop/TSATtutorial/mtsECG/ECG_TRAIN3.json
-ecgUnivar.train 1 50 1 2 1.0
+ecgUnivar.train 1 50 1 2 1.0 0
 \end{minted}
 
 The help documentation is displayed when used with the -h flag.  The help is shown below.
 \begin{minted}{bash}
 
-usage: tdaInterface.py [-h] MVData UVData numL window dt p maxrad
+usage: tdaInterface.py [-h] MVData UVData numL window dt p maxrad shouldConsolidate
 
 Topological Data Analysis tool to convert multivariate time series to
 univariate time series.
@@ -1271,8 +1277,8 @@ dt                 number of samples to skip between points.
 p                  integer (type of L^p norm to compute)
 maxrad             max distance between pairwise points to consider for the
 Rips complex
-shouldConsolidate  If true will merge values in the time series that are
-less than 10 time steps appart
+shouldConsolidate  If 1 will merge values in the time series that are
+less than 10 time steps apart.
 
 optional arguments:
 -h, --help  show this help message and exit
@@ -1282,7 +1288,7 @@ optional arguments:
 
 \section{Notes}
 ~\label{Notes}
-When training there must always be more than one example from each class label and there must be more than one label.  A sample call to convert a multiattribute time series ECG\_TRAIN3.json to a univariate time series and store in file 
+When training there must always be more than one example from each class label and there must be more than one label.  
 
 \paragraph{Installation}
 
@@ -1306,6 +1312,14 @@ $ java -Xmx2g -jar target/tsat-{\TSATVERSION}-SNAPSHOT-jar-with-dependencies.jar
 
 The -Xmx2g allocates max of 2Gb of memory for the software.
 
+\subsection{Javadoc}
+
+The javadoc can be created by running 
+
+\noindent\texttt{mvn javadoc:javadoc}\\
+in the root directory of {\TSAT}.  This will generate javadoc  in the directory\\
+\texttt{target/site/apidocs/}
+Then loading index.html in a browser will let you explore the generated javadoc.
 \paragraph{Topological Data Analysis Installation}
 
 In order to install the Topological Data Analysis tool we assume that an Anaconda environment is created with the name py36 with python 3.6 set as the python interpreter.  Now within the py36 conda enviroment do the following:
