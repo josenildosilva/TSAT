@@ -72,10 +72,18 @@ def multiToUniVar(mvTS, window, dt, pdim, maxrad):
         #shortenedAndLogDiff.append(newTS)
 
 
+
     stacked = np.stack(shortenedAndLogDiff, axis=-1)
+    #normalize to 0 mean and std dev of 1
+    tscaler=StandardScaler()
+    stacked=tscaler.fit_transform(stacked)
+
     norms2 = streamingLandscapePnorms(stacked,window, dt, pdim, dim=1,maxrad=maxrad)
-    scaler = MinMaxScaler(feature_range=(0,1))
+    scaler = MinMaxScaler(feature_range=(0,40))
     norms2normed = scaler.fit_transform(np.array([x[1] for x in norms2]).reshape(-1,1))
+
+
+
 #     if np.count_nonzero(norms2normed) > 0:
 #         plt.figure(figsize=(12,6),dpi=90)
 #         plt.plot(norms2normed,label="bytes")
@@ -118,6 +126,7 @@ def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad
             val = val.strip('[]')
             if 'label' not in d[i]:
                 # then this is an unlabeled time series
+                val = val.replace('  ', '') # for some reason there are extra spaces added!!!
                 val = " ".join(val.splitlines()).replace(' ', '\n')
                 data_out.write("{}".format(val))
                 break # only look at first time series if unlabeled
