@@ -63,13 +63,15 @@ def cubicInterpolate(y):
 
 
 
-def multiToUniVar(mvTS, window, dt, pdim, maxrad):
+def multiToUniVar(mvTS, window, dt, pdim, maxrad, logDiv):
     minLength = min([len(x) for x in mvTS])
     shortenedAndLogDiff = []
     for ts in mvTS:
         newTS = ts[:minLength]
-        shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
-        #shortenedAndLogDiff.append(newTS)
+        if logDiv == 1:
+            shortenedAndLogDiff.append(np.log(np.divide(newTS[1:], newTS[0:-1])))
+        else:
+            shortenedAndLogDiff.append(newTS)
 
 
 
@@ -90,7 +92,7 @@ def multiToUniVar(mvTS, window, dt, pdim, maxrad):
     return norms2normed
 
 
-def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad):
+def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad, logDiv):
     minLen = 1000
     wroteFirstLine = False
     
@@ -119,7 +121,7 @@ def parseJson(d, data_out, numLines, shouldConsolidate, window, dt, pdim, maxrad
         if len(mvTS) == 1:
             norms2normed = np.array(mvTS[0])
         elif len(mvTS) > 1:
-            norms2normed = multiToUniVar(mvTS, window, dt, pdim, maxrad)
+            norms2normed = multiToUniVar(mvTS, window, dt, pdim, maxrad, logDiv)
             
         if len(mvTS) > 0:
             val ="{}".format(norms2normed.reshape(1,-1))
@@ -152,6 +154,7 @@ parser.add_argument('dt', help='number of samples to skip between points.',type=
 parser.add_argument('p', help='integer (type of L^p norm to compute)', default=2, type=int)
 parser.add_argument('maxrad', help='max distance between pairwise points to consider for the Rips complex', default=1.0, type=float)
 parser.add_argument('shouldConsolidate', help='If 1 will merge values in the time series that are less than 10 time steps apart', default=0, type=int)
+parser.add_argument('shouldLogDivide', help='If 1 will log divide values in the time series ', default=1, type=int)
 
 args = parser.parse_args()
 
@@ -162,6 +165,8 @@ if args.shouldConsolidate == 1:
     consolidateTS = True
 else:
     consolidateTS = False
+
+logDivVal = args.shouldLogDivide
 window = args.window
 dt = args.dt
 pdim = args.p
@@ -173,5 +178,5 @@ print(consolidateTS)
 with open(univarFile, 'w') as data_out:
     with open(multivarFile) as json_data:
         d = json.load(json_data)
-        parseJson(d, data_out,numLines, consolidateTS, window, dt, pdim, maxrad)
+        parseJson(d, data_out,numLines, consolidateTS, window, dt, pdim, maxrad, logDivVal)
 

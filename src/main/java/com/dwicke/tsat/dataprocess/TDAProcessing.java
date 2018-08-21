@@ -15,6 +15,7 @@ public class TDAProcessing {
     String multiVarJsonFilename;
     String lineLimit;
     boolean isTestData;
+
     String univarTSFilename;
 
 
@@ -24,6 +25,7 @@ public class TDAProcessing {
     double maxRad = 1.0;
 
     boolean shouldConsolidate = false;
+    boolean shouldLogDivide;
 
 
     public TDAProcessing(String limitStr, String dataFileName, boolean isTestdata) {
@@ -53,7 +55,12 @@ public class TDAProcessing {
         if (shouldConsolidate == true) {
             consolidateTS = 1;
         }
-        String command = String.format("source /home/${USER}/.tsat;tda %s %s %s %s %s %s %s %s", multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(consolidateTS));
+        int logDiv = 1;
+        if (shouldLogDivide == false) {
+            logDiv = 0;
+        }
+
+        String command = String.format("source /home/${USER}/.tsat;tda %s %s %s %s %s %s %s %s %s", multiVarJsonFilename, univarTSFilename, lineLimit, String.valueOf(window), String.valueOf(dt), String.valueOf(p), String.valueOf(maxRad), String.valueOf(consolidateTS), String.valueOf(logDiv));
 
         ProcessBuilder pb = new ProcessBuilder("bash", "-c", command);
 
@@ -134,5 +141,13 @@ public class TDAProcessing {
 
     public void setShouldConsolidate(boolean shouldConsolidate) {
         this.shouldConsolidate = shouldConsolidate;
+    }
+
+    public boolean isShouldLogDivide() {
+        return shouldLogDivide;
+    }
+
+    public void setLogDivide(boolean logDivide) {
+        this.shouldLogDivide = logDivide;
     }
 }

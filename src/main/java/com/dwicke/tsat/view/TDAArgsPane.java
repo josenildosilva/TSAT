@@ -27,6 +27,7 @@ public class TDAArgsPane extends JPanel {
   private static final JLabel P_LABEL = new JLabel("Integer value for p in L^p norm to compute:");
   private static final JLabel MAXRAD_LABEL = new JLabel("max distance between pairwise points to consider for the Rips complex:");
   private static final JLabel CONSOLIDATE_LABEL = new JLabel("Should consolidate:");
+  private static final JLabel LOGDIV_LABEL = new JLabel("Should log divide time series data:");
 
   // and their UI widgets
   //
@@ -40,6 +41,8 @@ public class TDAArgsPane extends JPanel {
 
 
   private static final JCheckBox consolidateField = new JCheckBox("check if true");
+  private static final JCheckBox logdivField = new JCheckBox("check if true");
+
 
   /**
    * Constructor.
@@ -64,7 +67,11 @@ public class TDAArgsPane extends JPanel {
     this.add(maxRadField, "wrap");
 
     this.add(CONSOLIDATE_LABEL, "span 2");
-    this.add(consolidateField);
+    this.add(consolidateField, "wrap");
+
+    this.add(LOGDIV_LABEL, "span 2");
+    logdivField.setSelected(true);
+    this.add(logdivField);
 
 
     setValues(userSession);
@@ -78,6 +85,7 @@ public class TDAArgsPane extends JPanel {
     pField.setText(Integer.valueOf(userSession.getP()).toString());
     maxRadField.setText(Double.valueOf(userSession.getMaxRad()).toString());
     consolidateField.setSelected(userSession.isShouldConsolidate());
+    logdivField.setSelected(userSession.isShouldLogDivide());
 
   }
 
@@ -89,6 +97,7 @@ public class TDAArgsPane extends JPanel {
     userSession.setP(Integer.valueOf(pField.getText()));
     userSession.setMaxRad(Double.valueOf(maxRadField.getText()));
     userSession.setShouldConsolidate(consolidateField.isSelected());
+    userSession.setLogDivide(logdivField.isSelected());
 
   }
 
