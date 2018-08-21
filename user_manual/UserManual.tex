@@ -1259,7 +1259,9 @@ ecgUnivar.train 1 50 1 2 1.0 0
 The help documentation is displayed when used with the -h flag.  The help is shown below.
 \begin{minted}{bash}
 
-usage: tdaInterface.py [-h] MVData UVData numL window dt p maxrad shouldConsolidate
+usage: tdaInterface.py [-h]
+MVData UVData numL window dt p maxrad shouldConsolidate
+shouldLogDivide
 
 Topological Data Analysis tool to convert multivariate time series to
 univariate time series.
@@ -1277,8 +1279,9 @@ dt                 number of samples to skip between points.
 p                  integer (type of L^p norm to compute)
 maxrad             max distance between pairwise points to consider for the
 Rips complex
-shouldConsolidate  If 1 will merge values in the time series that are
-less than 10 time steps apart.
+shouldConsolidate  If 1 will merge values in the time series that are less
+than 10 time steps apart
+shouldLogDivide    If 1 will log divide values in the time series
 
 optional arguments:
 -h, --help  show this help message and exit
@@ -1355,13 +1358,17 @@ export tdaInterface="/home/${USER}/src/TSAT/src/main/resources/tdaInterface.py"
 function tda() {
 	conda activate py36
 	echo $CONDA_DEFAULT_ENV
-	python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7 $8
+	python -u $tdaInterface $1 $2 $3 $4 $5 $6 $7 $8 $9
 }
 
 export -f tda
 \end{minted}
 
 With the .tsat stored in the home directory which {\TSAT} will look for in order to execute TDA everything should work.
+
+\paragraph{Datasets}
+
+There are a number of examples for time series classification (including multivariate time series), anomaly detection (including multivariate time series), and motif discovery within the data directory in the root of the project.  Additionally, located at \url{http://timeseriesclassification.com/dataset.php} a number of time series in ARFF format that can be used in TSAT are available for download.
 
 \bibliographystyle{ieeetr}
 \bibliography{citations}

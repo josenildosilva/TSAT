@@ -154,7 +154,7 @@ parser.add_argument('dt', help='number of samples to skip between points.',type=
 parser.add_argument('p', help='integer (type of L^p norm to compute)', default=2, type=int)
 parser.add_argument('maxrad', help='max distance between pairwise points to consider for the Rips complex', default=1.0, type=float)
 parser.add_argument('shouldConsolidate', help='If 1 will merge values in the time series that are less than 10 time steps apart', default=0, type=int)
-parser.add_argument('shouldLogDivide', help='If 1 will log divide values in the time series ', default=1, type=int)
+parser.add_argument('shouldLogDivide', help='If 1 will log divide values in the time series', default=1, type=int)
 
 args = parser.parse_args()
 
